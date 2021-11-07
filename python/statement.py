@@ -15,15 +15,15 @@ def statement(invoice, plays):
             continue
         play = plays[performance['playID']]
 
-        tragedy_minimum_amount = 40000
-        tragedy_additional_seat_price = 1000
+        tragedy_minimum_amount = 400
+        tragedy_additional_seat_price = 10
         tragedy_seats_limit = 30
 
-        comedy_minimum_amount = 30000
-        comedy_additional_seat_price = 500
-        comedy_extra_seats_one_time_fee = 10000
+        comedy_minimum_amount = 300
+        comedy_additional_seat_price = 5
+        comedy_extra_seats_one_time_fee = 100
         comedy_seats_limit = 20
-        comedy_regular_seat_price = 300
+        comedy_regular_seat_price = 3
         performance_total = 0
 
         if play['type'] == "tragedy":
@@ -49,10 +49,10 @@ def statement(invoice, plays):
         if "comedy" == play["type"]:
             volume_credits += math.floor(performance['audience'] / 5)
         # print line for this order
-        result += f' {play["name"]}: {format_as_dollars(performance_total/100)} ({performance["audience"]} seats)\n'
+        result += f' {play["name"]}: {format_as_dollars(performance_total)} ({performance["audience"]} seats)\n'
         total_amount += performance_total
 
-    result += f'Amount owed is {format_as_dollars(total_amount/100)}\n'
+    result += f'Amount owed is {format_as_dollars(total_amount)}\n'
     result += f'You earned {volume_credits} credits\n'
     return result
 
