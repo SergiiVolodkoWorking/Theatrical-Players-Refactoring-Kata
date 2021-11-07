@@ -12,6 +12,10 @@
     {
       "playID": "othello",
       "audience": 40
+    },
+    {
+      "playID": "yes-man",
+      "audience": 29
     }
   ]
 }
