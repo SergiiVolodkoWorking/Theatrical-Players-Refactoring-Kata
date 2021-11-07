@@ -15,6 +15,22 @@ def test_example_statement():
     verify(statement(invoice, plays))
 
 
+def test_statement_with_empty_invoice():
+    with open(get_adjacent_file("invoice_no_performances.json")) as f:
+        invoice = json.loads(f.read())
+    with open(get_adjacent_file("plays.json")) as f:
+        plays = json.loads(f.read())
+    verify(statement(invoice, plays))
+
+
+def test_statement_with_empty_plays():
+    with open(get_adjacent_file("invoice.json")) as f:
+        invoice = json.loads(f.read())
+    with open(get_adjacent_file("plays_empty.json")) as f:
+        plays = json.loads(f.read())
+    verify(statement(invoice, plays))
+
+
 def test_statement_with_new_play_types():
     with open(get_adjacent_file("invoice_new_plays.json")) as f:
         invoice = json.loads(f.read())
