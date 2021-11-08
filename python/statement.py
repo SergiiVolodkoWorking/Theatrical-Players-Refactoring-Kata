@@ -58,21 +58,32 @@ def statement(invoice, plays):
     total_amount = 0
     total_volume_credits = 0
 
-    result = f'Statement for {invoice["customer"]}\n'
-
+    performances_for_report = []
     for performance in invoice['performances']:
         if not performance['playID'] in plays:
             continue
         play = plays[performance['playID']]
+        play_name = play['name']
         play_type = play['type']
         occupied_seats_count = performance['audience']
 
-        performance_total = calculate_performance_total_amount(play_type, occupied_seats_count)
+        amount = calculate_performance_total_amount(play_type, occupied_seats_count)
+        total_amount += amount
         total_volume_credits += calculate_volume_credits(play_type, occupied_seats_count)
-        total_amount += performance_total
 
-        # print line for this order
-        result += f' {play["name"]}: {format_as_dollars(performance_total)} ({occupied_seats_count} seats)\n'
+        performances_for_report.append({
+            "play_name": play_name,
+            "play_type": play_type,
+            "occupied_seats_count": occupied_seats_count,
+            "amount": amount,
+        })
+
+
+    customer_name = invoice["customer"]
+    result = f'Statement for {customer_name}\n'
+
+    for p in performances_for_report:
+        result += f' {p["play_name"]}: {format_as_dollars(p["amount"])} ({p["occupied_seats_count"]} seats)\n'
 
     result += f'Amount owed is {format_as_dollars(total_amount)}\n'
     result += f'You earned {total_volume_credits} credits\n'
