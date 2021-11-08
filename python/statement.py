@@ -1,12 +1,41 @@
 import math
 
-
 PLAY_TYPE_COMEDY = "comedy"
 PLAY_TYPE_TRAGEDY = "tragedy"
 
 
-def format_as_dollars(amount):
-    return f"${amount:0,.2f}"
+def statement(invoice, plays):
+    total_amount = 0
+    total_volume_credits = 0
+
+    performances_for_report = aggregate_performances_for_report(invoice, plays)
+    total_amount += sum(p['amount'] for p in performances_for_report)
+    total_volume_credits += sum(p['volume_credits'] for p in performances_for_report)
+
+    return generate_statement_text(invoice["customer"], performances_for_report, total_amount, total_volume_credits)
+
+
+def aggregate_performances_for_report(invoice, plays):
+    performances_for_report = []
+    for performance in invoice['performances']:
+        if not performance['playID'] in plays:
+            continue
+        play = plays[performance['playID']]
+        play_name = play['name']
+        play_type = play['type']
+        occupied_seats_count = performance['audience']
+
+        amount = calculate_performance_total_amount(play_type, occupied_seats_count)
+        volume_credits = calculate_volume_credits(play_type, occupied_seats_count)
+
+        performances_for_report.append({
+            "play_name": play_name,
+            "play_type": play_type,
+            "occupied_seats_count": occupied_seats_count,
+            "amount": amount,
+            "volume_credits": volume_credits
+        })
+    return performances_for_report
 
 
 def calculate_performance_total_amount(play_type: str, occupied_seats_count: int):
@@ -54,37 +83,14 @@ def calculate_volume_credits(play_type: str, occupied_seats_count: int):
     return volume_credits
 
 
-def statement(invoice, plays):
-    total_amount = 0
-    total_volume_credits = 0
-
-    performances_for_report = []
-    for performance in invoice['performances']:
-        if not performance['playID'] in plays:
-            continue
-        play = plays[performance['playID']]
-        play_name = play['name']
-        play_type = play['type']
-        occupied_seats_count = performance['audience']
-
-        amount = calculate_performance_total_amount(play_type, occupied_seats_count)
-        total_amount += amount
-        total_volume_credits += calculate_volume_credits(play_type, occupied_seats_count)
-
-        performances_for_report.append({
-            "play_name": play_name,
-            "play_type": play_type,
-            "occupied_seats_count": occupied_seats_count,
-            "amount": amount,
-        })
-
-
-    customer_name = invoice["customer"]
-    result = f'Statement for {customer_name}\n'
-
+def generate_statement_text(customer_name, performances_for_report, total_amount, total_volume_credits):
+    text = f'Statement for {customer_name}\n'
     for p in performances_for_report:
-        result += f' {p["play_name"]}: {format_as_dollars(p["amount"])} ({p["occupied_seats_count"]} seats)\n'
+        text += f' {p["play_name"]}: {format_as_dollars(p["amount"])} ({p["occupied_seats_count"]} seats)\n'
+    text += f'Amount owed is {format_as_dollars(total_amount)}\n'
+    text += f'You earned {total_volume_credits} credits\n'
+    return text
 
-    result += f'Amount owed is {format_as_dollars(total_amount)}\n'
-    result += f'You earned {total_volume_credits} credits\n'
-    return result
+
+def format_as_dollars(amount):
+    return f"${amount:0,.2f}"
