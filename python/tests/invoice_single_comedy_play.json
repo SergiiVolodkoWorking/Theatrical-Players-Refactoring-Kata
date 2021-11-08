@@ -1,0 +1,9 @@
+{
+  "customer": "BigBo",
+  "performances": [
+    {
+      "playID": "yes-man",
+      "audience": 10
+    }
+  ]
+}
